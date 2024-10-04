@@ -1,4 +1,5 @@
 # Tap_CHA
 
-### pip install apscheduler pytz
+### pip install apscheduler 
 ### pip install selenium
+### pip install pytz
