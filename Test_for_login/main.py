@@ -55,7 +55,9 @@ def login():
 def task():
     print("任务在北京时间执行:", datetime.now())
     login()
-    exit(0)
+    #task 模拟发送post请求
+
+    # exit(0)
 
 
 # 创建调度器
