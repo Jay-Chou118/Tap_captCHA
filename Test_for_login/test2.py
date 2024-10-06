@@ -14,7 +14,25 @@ response = session.get(url_login_page, headers=headers)
 # # Step 2: 解析 CSRF token
 soup = BeautifulSoup(response.text, 'html.parser')
 #
-print(soup)
+# print(soup)
+# import requests
+# from bs4 import BeautifulSoup
+#
+# # Step 1: 发送 GET 请求获取页面 HTML
+# url_login_page = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
+# headers = {
+#     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36'
+# }
+# session = requests.Session()
+# response = session.get(url_login_page, headers=headers)
+#
+# print(response.text)
+#
+# # Step 2: 解析 CSRF token
+# soup = BeautifulSoup(response.text, 'html.parser')
+#
+# print(soup)
+>>>>>>> c7e4362ed90d24b55337bbf8ce8b0267e7aa9923
 # csrf_token = soup.find('input', {'name': 'csrf_token'})['value']  # 需要根据实际页面结构找到正确的字段名称
 #
 # # Step 3: 使用 CSRF token 进行 POST 请求
