@@ -9,10 +9,21 @@ headers = {
 session = requests.Session()
 response = session.get(url_login_page, headers=headers)
 
+url_getData = 'https://ehall.fudan.edu.cn/taskcenterapp/sys/pubdzyktyejkapp/yktye/getData.do'
 # print(response.text)
-#
+
+response = session.get(url_getData, headers=headers)
+# print(response.text)
+
+url_getByCardsPages = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getByCardsPages?_=1728265897764'
+url_getPortal = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getPortalPage?_=1728265897891'
+url_getUserInfo = 'https://ehall.fudan.edu.cn/jsonp/ywtb/info/getUserInfoAndSchoolInfo.json?_=1728265898003'
+url_getfirst = 'https://ehall.fudan.edu.cn/jsonp/getUserFirstLogin?_=1728266262996'
+response = session.get(url_getUserInfo, headers=headers)
+print(response.text)
+
 # # Step 2: 解析 CSRF token
-soup = BeautifulSoup(response.text, 'html.parser')
+# soup = BeautifulSoup(response.text, 'html.parser')
 #
 # print(soup)
 # import requests
@@ -32,7 +43,7 @@ soup = BeautifulSoup(response.text, 'html.parser')
 # soup = BeautifulSoup(response.text, 'html.parser')
 #
 # print(soup)
->>>>>>> c7e4362ed90d24b55337bbf8ce8b0267e7aa9923
+
 # csrf_token = soup.find('input', {'name': 'csrf_token'})['value']  # 需要根据实际页面结构找到正确的字段名称
 #
 # # Step 3: 使用 CSRF token 进行 POST 请求

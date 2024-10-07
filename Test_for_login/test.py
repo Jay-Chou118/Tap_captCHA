@@ -26,7 +26,7 @@ soup = BeautifulSoup(response.text, 'html.parser')
 # data['csrf_token'] = csrf_token
 
 # Step 2: 使用正确的请求地址发送登录请求
-url_post = 'https://ehall.fudan.edu.cn/casp-ioc//api/clientIp'   # 从抓包分析中获取
+url_post = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getPortalPage?_=1728265897891'   # 从抓包分析中获取
 response = session.post(url_post, data=data, headers=headers)
 print(response.text)
 # Step 3: 检查登录是否成功
