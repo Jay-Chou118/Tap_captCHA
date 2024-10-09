@@ -19,6 +19,7 @@ headers = {
     "Accept-Language": "en-US,en;q=0.9",
     "Connection": "keep-alive",
 }
+
 get_reservables_url = "https://elife.fudan.edu.cn/app/api/toResourceFrame.action"
 sso_url = "https://elife.fudan.edu.cn/sso/login?targetUrl=base64aHR0cHM6Ly9lbGlmZS5mdWRhbi5lZHUuY24vYXBw"
 app_url = "https://elife.fudan.edu.cn/app/"
