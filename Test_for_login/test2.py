@@ -9,10 +9,6 @@ headers = {
 session = requests.Session()
 response = session.get(url_login_page, headers=headers)
 
-url_getData = 'https://ehall.fudan.edu.cn/taskcenterapp/sys/pubdzyktyejkapp/yktye/getData.do'
-# print(response.text)
-
-response = session.get(url_getData, headers=headers)
 # print(response.text)
 
 url_getByCardsPages = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getByCardsPages?_=1728265897764'
@@ -23,7 +19,7 @@ response = session.get(url_getUserInfo, headers=headers)
 print(response.text)
 
 # # Step 2: 解析 CSRF token
-# soup = BeautifulSoup(response.text, 'html.parser')
+soup = BeautifulSoup(response.text, 'html.parser')
 #
 # print(soup)
 # import requests
