@@ -46,7 +46,13 @@ data = {'username': '23210720160',
 
 
 
-# week = {'1':}
+week = {'1':'one1',
+           '2':'one2',
+           '3':'oen3',
+           '4':'one4',
+           '5':'one5',
+           '6':'one6',
+           '7':'one7'}
 
 # 定义函数来将网页上的日期字符串转换为 datetime 对象
 def convert_to_date(date_str):
@@ -122,7 +128,6 @@ def login():
         driver.find_element(By.ID, 'idcheckloginbtn').click()
 
         time.sleep(1)
-        print('finsih login')
         # driver.find_element(By.ID,'searchbarId').send_keys('体')
         # time.sleep(1)
         # 添加延时或保持打开
@@ -130,21 +135,12 @@ def login():
         driver.find_element(By.XPATH, '//input[@class="content" and @maxlength="100"]').send_keys('体')
         time.sleep(1)
         driver.find_element(By.XPATH, '//button[@class="btn amp-theme" and @type="button"]').click()
-        time.sleep(1)
+        time.sleep(2)
         driver.find_element(By.CLASS_NAME,'ivu-tooltip-rel').click()
         time.sleep(1)
         driver.find_element(By.XPATH, '//div[@class="amp-theme app-enter"]').click()
         time.sleep(1)
-        # 添加寻找元素
-        #
-        #因为切换页面了，所以捕获不到
-        #
-        # < a
-        # style = "color:#c00;font-weight:bold"
-        # href = "/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2" > 立即预订 < / a >
-        # < a
-        # style = "color:#c00;font-weight:bold"
-        # href = "/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2" > 立即预订 < / a >
+
         # 获取所有的窗口句柄
         all_windows = driver.window_handles
         for window in all_windows:
@@ -161,7 +157,13 @@ def login():
         # # 获取所有包含日期的 li 元素
         date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
         time.sleep(1)
+
+
+
         driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
+        time.sleep(1)
+
+        driver.find_element(By.ID,'one3').click()
         for date_element in date_elements:
              # 提取日期文本并转换为日期对象
             print("date_element " ,date_element)
@@ -181,6 +183,9 @@ def login():
                 date_element.click()  # 点击日期
                 found = True
                 break
+
+
+
         # driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
 
 
@@ -318,6 +323,5 @@ def login():
 
 if __name__ == '__main__':
     print("here we go!!")
-
     login()
     # search()
