@@ -12,6 +12,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 import requests
+from datetime import datetime
+
+# 获取当前系统时间
+current_time = datetime.now()
 
 #maybe change
 headers = {
@@ -26,14 +30,15 @@ headers = {
 
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
-data = {'username': '',
-        'password': ''}
+data = {'username': '23210720160',
+        'password': 'guoBB18876322223'}
 
 
 # session = requests.session()
 # cookie_jar = session.post(url=url, data=data, headers=headers).cookies
 # cookie_t = requests.utils.dict_from_cookiejar(cookie_jar)
 def login():
+        print('当前时间： ',current_time)
         driver = webdriver.Edge()
         # driver = webdriver.Chrome()
         driver.get(url)
@@ -62,7 +67,7 @@ def login():
         driver.find_element(By.CLASS_NAME,'ivu-tooltip-rel').click()
         time.sleep(1)
         driver.find_element(By.XPATH, '//div[@class="amp-theme app-enter"]').click()
-        time.sleep(2)
+        time.sleep(1)
         # 添加寻找元素
         #
         #因为切换页面了，所以捕获不到
@@ -73,23 +78,30 @@ def login():
         # < a
         # style = "color:#c00;font-weight:bold"
         # href = "/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2" > 立即预订 < / a >
-        try:
-            # 等待并定位链接
-            link_element = WebDriverWait(driver, 10).until(
-                EC.element_to_be_clickable((By.XPATH,
-                                            '//a[@href="/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2"]'))
-            )
+        # 获取所有的窗口句柄
+        all_windows = driver.window_handles
+        for window in all_windows:
+            print(window)
+        # 切换到新窗口（假设新窗口是最后一个）
+        driver.switch_to.window(all_windows[-1])
 
-            # 点击 '立即预订' 链接
-            link_element.click()
+        try:
+            WebDriverWait(driver, 1).until(EC.element_to_be_clickable((By.XPATH,
+                                            '//a[@href="/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2"]'))).click()
 
         except Exception as e:
             print(f"发生错误: {e}")
+        # 获取所有包含日期的 li 元素
+        date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
 
+        # 提取每个 li 元素中的日期文本
+        for date_element in date_elements:
+            date_text = date_element.text.strip()
+            print(date_text)
         # 关闭浏览器
         # driver.quit()
 
-        # input("Press Enter to close the browser·...")  # 按回车键后才关闭
+        input("Press Enter to close the browser·...")  # 按回车键后才关闭
 
 
 # input("Press Enter to close the browser·...")  # 按回车键后才关闭
