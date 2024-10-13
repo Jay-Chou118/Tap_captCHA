@@ -26,8 +26,8 @@ headers = {
 
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
-data = {'username': '23210720160',
-        'password': 'guoBB18876322223'}
+data = {'username': '',
+        'password': ''}
 
 
 # session = requests.session()
@@ -62,8 +62,34 @@ def login():
         driver.find_element(By.CLASS_NAME,'ivu-tooltip-rel').click()
         time.sleep(1)
         driver.find_element(By.XPATH, '//div[@class="amp-theme app-enter"]').click()
-        time.sleep(1)
-        input("Press Enter to close the browser·...")  # 按回车键后才关闭
+        time.sleep(2)
+        # 添加寻找元素
+        #
+        #因为切换页面了，所以捕获不到
+        #
+        # < a
+        # style = "color:#c00;font-weight:bold"
+        # href = "/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2" > 立即预订 < / a >
+        # < a
+        # style = "color:#c00;font-weight:bold"
+        # href = "/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2" > 立即预订 < / a >
+        try:
+            # 等待并定位链接
+            link_element = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.XPATH,
+                                            '//a[@href="/public/front/toResourceFrame.htm?contentId=8aecc6ce749544fd01749a31a04332c2"]'))
+            )
+
+            # 点击 '立即预订' 链接
+            link_element.click()
+
+        except Exception as e:
+            print(f"发生错误: {e}")
+
+        # 关闭浏览器
+        # driver.quit()
+
+        # input("Press Enter to close the browser·...")  # 按回车键后才关闭
 
 
 # input("Press Enter to close the browser·...")  # 按回车键后才关闭

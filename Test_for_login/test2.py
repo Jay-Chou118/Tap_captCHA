@@ -1,7 +1,14 @@
+import time
+
 import requests
 from bs4 import BeautifulSoup, FeatureNotFound
 
 import base64
+
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 
 # Step 1: 发送 GET 请求获取页面 HTML
@@ -21,8 +28,8 @@ app_url = "https://elife.fudan.edu.cn/app/"
 error_string = "您将登录的是："
 
 data = {
-        "username": "23210720160",
-        "password": "guoBB18876322223"
+        "username": "",
+        "password": ""
     }
 
 session = requests.Session()
@@ -38,7 +45,7 @@ login_url = response.url
 print(login_url)
 session.get(app_url, allow_redirects=True)
 response = session.get(login_url, allow_redirects=True)
-print(response.text)
+# print(response.text)
 
 soup = BeautifulSoup(response.text, "lxml")
 inputs = soup.find_all("input")
@@ -48,14 +55,22 @@ for input in inputs[2::]:
 session.headers.update({"Referer": "https://uis.fudan.edu.cn/"})
 response = session.post(login_url, data=data, allow_redirects=True)
 
+print(response.text)
+print(response.cookies)
+print(response.url)
+
 
 if error_string in response.text:
     print("UIS Login Failed")
     raise Exception("UIS Login Failed")
 
-print("UIS Login Successful", "INFO")
+print("UIS Login Successful")
+# driver = webdriver.Edge()
 
 
+# driver = webdriver.Chrome()
+# driver.get('https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall')
+# time.sleep(10)
 # url_getByCardsPages = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getByCardsPages?_=1728265897764'
 # url_getPortal = 'https://ehall.fudan.edu.cn/jsonp/ywtb/home/getPortalPage?_=1728265897891'
 # url_getUserInfo = 'https://ehall.fudan.edu.cn/jsonp/ywtb/info/getUserInfoAndSchoolInfo.json?_=1728265898003'
