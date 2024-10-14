@@ -1,18 +1,15 @@
-import time
-from email.header import Header
+# from Demos.security.setkernelobjectsecurity import desired_privs
+# from apscheduler.schedulers.blocking import BlockingScheduler
+# from apscheduler.triggers.cron import CronTrigger
+# import pytz
+# from datetime import datetime
 
-from apscheduler.schedulers.blocking import BlockingScheduler
-from apscheduler.triggers.cron import CronTrigger
-import pytz
 from datetime import datetime
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-
-import requests
-from datetime import datetime, timedelta
 
 # 获取当前系统时间
 current_time = datetime.now()
@@ -57,6 +54,9 @@ week = {   '1':'one1',
            '5':'one5',
            '6':'one6',
            '7':'one7'}
+
+# 定义一个变量来记录找到的预订项
+found_reservations = []
 
 # 定义函数来将网页上的日期字符串转换为 datetime 对象
 def convert_to_date(date_str):
@@ -122,7 +122,11 @@ def login():
         # 让用户输入目标日期，格式为 YYYY-MM-DD
         user_input_date_str = input("请输入目标日期 (格式为 YYYY-MM-DD): ")
         # user_input_date_str = '2024-10-15'
-
+        # 获取用户输入的时间段，支持多选，以逗号分隔
+        desired_times = input("请输入您想预订的时间段 (例如 '09:00, 10:00'): ").strip().split(',')
+        # desired_times = '10:00'
+        # 去掉每个时间段前后的空格
+        desired_times = [time.strip() for time in desired_times]
         # 将用户输入的日期字符串转换为 date 对象
         try:
             user_input_date = datetime.strptime(user_input_date_str, "%Y-%m-%d").date()
@@ -165,8 +169,8 @@ def login():
 
         # 获取所有的窗口句柄
         all_windows = driver.window_handles
-        for window in all_windows:
-            print(window)
+        # for window in all_windows:
+            # print(window)
         # 切换到新窗口（假设新窗口是最后一个）
         driver.switch_to.window(all_windows[-1])
 
@@ -189,11 +193,61 @@ def login():
 
         find_date_and_click(driver,user_input_date)
 
+        # 找到页面中所有的预订行（每个 <tr>）
+        rows = driver.find_elements(By.XPATH, '//table[@class="site_table"]/tbody/tr')
 
+        # 遍历每一个用户输入的时间段
+        for desired_time in desired_times:
+            reservation_found = False  # 标记是否找到匹配的时间段
 
-        # driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
+            # 遍历每一行，查找与当前用户输入的时间段匹配的预订项
+            for row in rows:
+                try:
+                    # 获取时间段
+                    time_slot = row.find_element(By.XPATH, './td[1]').text.strip()
 
+                    # 如果时间段与用户输入的时间匹配
+                    if desired_time in time_slot:
+                        print(f"找到匹配的时间段: {time_slot}")
 
+                        # 获取服务项目名称
+                        service_item = row.find_element(By.XPATH, './td[2]').text.strip()
+
+                        # 检查是否有预订按钮
+                        img_element = row.find_element(By.XPATH, './td[@align="right"]/img')
+                        img_src = img_element.get_attribute('src')
+
+                        # 判断是否为可点击的预订按钮
+                        if 'reserve.gif' in img_src:
+                            # 执行点击操作
+                            img_element.click()
+                            # 通过 XPath 定位并点击按钮
+                            driver.find_element(By.XPATH, '//input[@value="点击按钮进行验证 "]').click()
+
+                            # WebDriverWait(driver, 10).until(
+                            #     EC.element_to_be_clickable((By.ID, "btn_sub"))
+                            # ).click()
+                            print(f"已成功预订时间段: {time_slot}，服务项目: {service_item}")
+                            found_reservations.append({'time': time_slot, 'service': service_item})
+                            reservation_found = True
+                            break
+                        else:
+                            print(f"时间段 {time_slot} 的预订已满，无法点击预订。")
+
+                except Exception as e:
+                    # 如果未找到相关元素或者其他错误，跳过该行
+                    continue
+
+            if not reservation_found:
+                print(f"未找到与输入的时间段 {desired_time} 匹配且可点击的预订项。")
+
+        # 打印所有成功预订的时间段
+        if found_reservations:
+            print("已成功预订以下时间段：")
+            for reservation in found_reservations:
+                print(f"时间段: {reservation['time']}, 服务项目: {reservation['service']}")
+        else:
+            print("没有成功的预订。")
 
 
         input("Press Enter to close the browser·...")  # 按回车键后才关闭
