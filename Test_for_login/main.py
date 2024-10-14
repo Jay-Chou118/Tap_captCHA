@@ -42,8 +42,8 @@ headers = {
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
 #输入自己的账号和密码
-data = {'username': '23210720160',
-        'password': 'guoBB18876322223'}
+data = {'username': '',
+        'password': ''}
 
 # 初始化找到的标志
 found = False
