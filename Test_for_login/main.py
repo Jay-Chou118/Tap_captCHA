@@ -1,12 +1,9 @@
-<<<<<<< HEAD
 import time
 import base64
 import os
 
 # import ddddocr
 
-=======
->>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -18,17 +15,6 @@ current_time = datetime.now()
 
 # 获取当前系统日期
 current_date = datetime.now().date()
-<<<<<<< HEAD
-=======
-
-
-# # 设定 1-3 天的范围
-# min_date = current_date + timedelta(days=1)
-# max_date = current_date + timedelta(days=3)
-
-# # 标记是否需要切换到下一周
-# need_next_week = False
->>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 
 
 
@@ -63,13 +49,10 @@ week = {   '1':'one1',
 # 定义一个变量来记录找到的预订项
 found_reservations = []
 
-<<<<<<< HEAD
 # 指定保存路径
 save_directory = os.path.join(os.path.dirname(__file__), 'captCHA_img')
 
  
-=======
->>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 # 定义函数来将网页上的日期字符串转换为 datetime 对象
 def convert_to_date(date_str):
     return datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -203,18 +186,12 @@ def login():
         # 让用户输入目标日期，格式为 YYYY-MM-DD
         user_input_date_str = input("请输入目标日期 (格式为 YYYY-MM-DD): ")
         # user_input_date_str = '2024-10-15'
-<<<<<<< HEAD
 
         # 获取用户输入的时间段，支持多选，以逗号分隔
         desired_times = input("请输入您想预订的时间段 (例如 '09:00, 10:00'): ").strip().split(',')
         # desired_times = '08:00'
 
 
-=======
-        # 获取用户输入的时间段，支持多选，以逗号分隔
-        desired_times = input("请输入您想预订的时间段 (例如 '09:00, 10:00'): ").strip().split(',')
-        # desired_times = '10:00'
->>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
         # 去掉每个时间段前后的空格
         desired_times = [time.strip() for time in desired_times]
         # 将用户输入的日期字符串转换为 date 对象
@@ -313,12 +290,9 @@ def login():
                             img_element.click()
                             # 通过 XPath 定位并点击按钮
                             driver.find_element(By.XPATH, '//input[@value="点击按钮进行验证 "]').click()
-<<<<<<< HEAD
                             
                             time.sleep(1)
                             save_captcha_info(driver,save_directory,1)
-=======
->>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 
                             # WebDriverWait(driver, 10).until(
                             #     EC.element_to_be_clickable((By.ID, "btn_sub"))
@@ -385,6 +359,5 @@ def login():
 # scheduler.start()
 
 if __name__ == '__main__':
-    # while 1:
     login()
     # search()

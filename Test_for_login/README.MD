@@ -10,6 +10,8 @@
 #### main.py通过使用网页模拟操作进行登录
 #### 一般没法提交推送代码的原因是port权限没开
 #### port权限打开方法：https://blog.csdn.net/qq_40296909/article/details/134285451
-#
+##### git config --global  http.proxy 127.0.0.1:端口号
+##### git config --global  https.proxy 127.0.0.1:端口号
+##### git config --global -l 查看目前端口结果
 
 #### 按理说，模拟网页进行操作的会比较快
