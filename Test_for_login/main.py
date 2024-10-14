@@ -19,12 +19,14 @@ current_time = datetime.now()
 
 # 获取当前系统日期
 current_date = datetime.now().date()
-# 设定 1-3 天的范围
-min_date = current_date + timedelta(days=1)
-max_date = current_date + timedelta(days=3)
 
-# 标记是否需要切换到下一周
-need_next_week = False
+
+# # 设定 1-3 天的范围
+# min_date = current_date + timedelta(days=1)
+# max_date = current_date + timedelta(days=3)
+
+# # 标记是否需要切换到下一周
+# need_next_week = False
 
 
 
