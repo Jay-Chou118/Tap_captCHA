@@ -1,23 +1,34 @@
+<<<<<<< HEAD
 import time
 import base64
 import os
 
 # import ddddocr
 
+=======
+>>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 from datetime import datetime
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-import requests
-from datetime import datetime, timedelta
-
 # 获取当前系统时间
 current_time = datetime.now()
 
 # 获取当前系统日期
 current_date = datetime.now().date()
+<<<<<<< HEAD
+=======
+
+
+# # 设定 1-3 天的范围
+# min_date = current_date + timedelta(days=1)
+# max_date = current_date + timedelta(days=3)
+
+# # 标记是否需要切换到下一周
+# need_next_week = False
+>>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 
 
 
@@ -34,12 +45,14 @@ headers = {
 
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
-data = {'username': '23210720160',
-        'password': 'guoBB18876322223'}
+#输入自己的账号和密码
+data = {'username': '',
+        'password': ''}
 
+# 初始化找到的标志
+found = False
 
-
-week = {'1':'one1',
+week = {   '1':'one1',
            '2':'one2',
            '3':'oen3',
            '4':'one4',
@@ -50,42 +63,60 @@ week = {'1':'one1',
 # 定义一个变量来记录找到的预订项
 found_reservations = []
 
+<<<<<<< HEAD
 # 指定保存路径
 save_directory = os.path.join(os.path.dirname(__file__), 'captCHA_img')
 
  
+=======
+>>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 # 定义函数来将网页上的日期字符串转换为 datetime 对象
 def convert_to_date(date_str):
     return datetime.strptime(date_str, "%Y-%m-%d").date()
 
 
-# 定义一个函数来查找页面上的日期并检查是否需要换页
-def find_and_click_date(driver,user_date,date_elements):
-    while True:
-        # 遍历所有日期元素，查找用户输入的日期
+# 定义函数来遍历页面元素并查找日期
+def find_date_and_click(driver,user_input_date):
+    global found
+
+    while not found:
+        # 获取当前页面上所有日期元素
+        date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
+
         for date_element in date_elements:
-            # 提取日期文本并转换为日期对象
+            print("date_element: ", date_element)
             date_text = date_element.text.split("\n")[0].strip()  # 提取日期文本
             print(f"网页上的日期文本: {date_text}")
 
             try:
                 element_date = convert_to_date(date_text)
             except ValueError:
-                # 忽略无法转换的文本（例如非日期的元素）
+                # 如果不是有效日期，跳过该元素
                 continue
 
-            # 检查是否是用户输入的日期
-            if element_date == user_date:
-                print(f"找到日期  点击该元素")
-                date_element.click()
-                return True
+            # 如果日期与用户输入的日期匹配
+            if element_date == user_input_date:
+                print(f"找到日期 {user_input_date}，点击该元素")
 
-                # 如果没找到，点击下一页按钮
-            print(f"日期 {user_date} 不在当前页面，点击 '下一页'")
+                # 获取用户输入的日期对应的星期几（1是星期一，7是星期日）
+                weekday_number = user_input_date.isoweekday()
+
+                # 根据星期几，获取对应的one ID
+                one_id = week.get(str(weekday_number))
+
+                if one_id:
+                    # 通过ID找到并点击对应的li元素
+                    driver.find_element(By.ID, one_id).click()
+                    found = True
+                    break
+
+        # 如果未找到，点击“下一页”按钮继续翻页
+        if not found:
+            print(f"日期 {user_input_date} 不在当前页面，点击 '下一页'")
             try:
-                # right_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
-                # right_button.click()
-                driver.find_element(By.XPATH,'//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
+                next_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
+                next_button.click()
+
                 # 等待页面加载完成
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//ul/li[starts-with(@id, "one")]'))
@@ -172,17 +203,25 @@ def login():
         # 让用户输入目标日期，格式为 YYYY-MM-DD
         user_input_date_str = input("请输入目标日期 (格式为 YYYY-MM-DD): ")
         # user_input_date_str = '2024-10-15'
+<<<<<<< HEAD
 
         # 获取用户输入的时间段，支持多选，以逗号分隔
         desired_times = input("请输入您想预订的时间段 (例如 '09:00, 10:00'): ").strip().split(',')
         # desired_times = '08:00'
 
 
+=======
+        # 获取用户输入的时间段，支持多选，以逗号分隔
+        desired_times = input("请输入您想预订的时间段 (例如 '09:00, 10:00'): ").strip().split(',')
+        # desired_times = '10:00'
+>>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
         # 去掉每个时间段前后的空格
         desired_times = [time.strip() for time in desired_times]
         # 将用户输入的日期字符串转换为 date 对象
         try:
             user_input_date = datetime.strptime(user_input_date_str, "%Y-%m-%d").date()
+            # weekday_number = user_input_date.isoweekday()
+            # print(weekday_number)
         except ValueError:
             print("日期格式不正确，请输入正确的 YYYY-MM-DD 格式")
             exit()
@@ -220,8 +259,8 @@ def login():
 
         # 获取所有的窗口句柄
         all_windows = driver.window_handles
-        for window in all_windows:
-            print(window)
+        # for window in all_windows:
+            # print(window)
         # 切换到新窗口（假设新窗口是最后一个）
         driver.switch_to.window(all_windows[-1])
 
@@ -231,35 +270,9 @@ def login():
 
         except Exception as e:
             print(f"发生错误: {e}")
-        # # 获取所有包含日期的 li 元素
-        date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
-        time.sleep(1)
-
-
-
-        driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
-        time.sleep(1)
-
-        driver.find_element(By.ID,'one3').click()
-        for date_element in date_elements:
-             # 提取日期文本并转换为日期对象
-            print("date_element " ,date_element)
-            # 提取日期文本并转换为日期对象
-            date_text = date_element.text.split("\n")[0].strip()  # 仅提取日期部分
-            print(f"网页上的日期文本: {date_text}")
-
-            try:
-                element_date = convert_to_date(date_text)
-            except ValueError:
-                # 忽略无法转换的文本（例如非日期的元素）
-                continue
-
-            # 检查是否是用户输入的日期
-            if element_date == user_input_date:
-                print(f"找到日期 {user_input_date}，点击该元素")
-                date_element.click()  # 点击日期
-                found = True
-                break
+        # 获取所有包含日期的 li 元素
+        # date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
+        # time.sleep(1)
 
 
 
@@ -300,9 +313,12 @@ def login():
                             img_element.click()
                             # 通过 XPath 定位并点击按钮
                             driver.find_element(By.XPATH, '//input[@value="点击按钮进行验证 "]').click()
+<<<<<<< HEAD
                             
                             time.sleep(1)
                             save_captcha_info(driver,save_directory,1)
+=======
+>>>>>>> d789aa44419e9b5c217dfa367e298cdf46253dcd
 
                             # WebDriverWait(driver, 10).until(
                             #     EC.element_to_be_clickable((By.ID, "btn_sub"))
