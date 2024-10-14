@@ -41,12 +41,14 @@ headers = {
 
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
+#输入自己的账号和密码
 data = {'username': '23210720160',
         'password': 'guoBB18876322223'}
 
+# 初始化找到的标志
+found = False
 
-
-week = {'1':'one1',
+week = {   '1':'one1',
            '2':'one2',
            '3':'oen3',
            '4':'one4',
@@ -59,40 +61,55 @@ def convert_to_date(date_str):
     return datetime.strptime(date_str, "%Y-%m-%d").date()
 
 
-# 定义一个函数来查找页面上的日期并检查是否需要换页
-def find_and_click_date(driver,user_date,date_elements):
-    while True:
-        # 遍历所有日期元素，查找用户输入的日期
+# 定义函数来遍历页面元素并查找日期
+def find_date_and_click(driver,user_input_date):
+    global found
+
+    while not found:
+        # 获取当前页面上所有日期元素
+        date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
+
         for date_element in date_elements:
-            # 提取日期文本并转换为日期对象
+            print("date_element: ", date_element)
             date_text = date_element.text.split("\n")[0].strip()  # 提取日期文本
             print(f"网页上的日期文本: {date_text}")
 
             try:
                 element_date = convert_to_date(date_text)
             except ValueError:
-                # 忽略无法转换的文本（例如非日期的元素）
+                # 如果不是有效日期，跳过该元素
                 continue
 
-            # 检查是否是用户输入的日期
-            if element_date == user_date:
-                print(f"找到日期  点击该元素")
-                date_element.click()
-                return True
+            # 如果日期与用户输入的日期匹配
+            if element_date == user_input_date:
+                print(f"找到日期 {user_input_date}，点击该元素")
 
-                # 如果没找到，点击下一页按钮
-            print(f"日期 {user_date} 不在当前页面，点击 '下一页'")
+                # 获取用户输入的日期对应的星期几（1是星期一，7是星期日）
+                weekday_number = user_input_date.isoweekday()
+
+                # 根据星期几，获取对应的one ID
+                one_id = week.get(str(weekday_number))
+
+                if one_id:
+                    # 通过ID找到并点击对应的li元素
+                    driver.find_element(By.ID, one_id).click()
+                    found = True
+                    break
+
+        # 如果未找到，点击“下一页”按钮继续翻页
+        if not found:
+            print(f"日期 {user_input_date} 不在当前页面，点击 '下一页'")
             try:
-                # right_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
-                # right_button.click()
-                driver.find_element(By.XPATH,'//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
+                next_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
+                next_button.click()
+
                 # 等待页面加载完成
                 WebDriverWait(driver, 10).until(
                     EC.presence_of_element_located((By.XPATH, '//ul/li[starts-with(@id, "one")]'))
                 )
             except Exception as e:
                 print(f"无法点击下一页: {e}")
-                return False
+                break
 
 
 # session = requests.session()
@@ -101,11 +118,14 @@ def find_and_click_date(driver,user_date,date_elements):
 def login():
 
         # 让用户输入目标日期，格式为 YYYY-MM-DD
-        # user_input_date_str = input("请输入目标日期 (格式为 YYYY-MM-DD): ")
-        user_input_date_str = '2024-10-15'
+        user_input_date_str = input("请输入目标日期 (格式为 YYYY-MM-DD): ")
+        # user_input_date_str = '2024-10-15'
+
         # 将用户输入的日期字符串转换为 date 对象
         try:
             user_input_date = datetime.strptime(user_input_date_str, "%Y-%m-%d").date()
+            # weekday_number = user_input_date.isoweekday()
+            # print(weekday_number)
         except ValueError:
             print("日期格式不正确，请输入正确的 YYYY-MM-DD 格式")
             exit()
@@ -154,35 +174,18 @@ def login():
 
         except Exception as e:
             print(f"发生错误: {e}")
-        # # 获取所有包含日期的 li 元素
-        date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
-        time.sleep(1)
+        # 获取所有包含日期的 li 元素
+        # date_elements = driver.find_elements(By.XPATH, '//ul/li[starts-with(@id, "one")]')
+        # time.sleep(1)
 
 
 
-        driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
-        time.sleep(1)
+        # driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
+        # time.sleep(1)
 
-        driver.find_element(By.ID,'one3').click()
-        for date_element in date_elements:
-             # 提取日期文本并转换为日期对象
-            print("date_element " ,date_element)
-            # 提取日期文本并转换为日期对象
-            date_text = date_element.text.split("\n")[0].strip()  # 仅提取日期部分
-            print(f"网页上的日期文本: {date_text}")
+        # driver.find_element(By.ID,'one3').click()
 
-            try:
-                element_date = convert_to_date(date_text)
-            except ValueError:
-                # 忽略无法转换的文本（例如非日期的元素）
-                continue
-
-            # 检查是否是用户输入的日期
-            if element_date == user_input_date:
-                print(f"找到日期 {user_input_date}，点击该元素")
-                date_element.click()  # 点击日期
-                found = True
-                break
+        find_date_and_click(driver,user_input_date)
 
 
 
@@ -190,96 +193,6 @@ def login():
 
 
 
-
-        #
-        # cmd = True
-        # # find_and_click_date(driver,user_input_date,date_elements)
-        # while (cmd == True):
-        #     # 遍历所有日期元素，查找用户输入的日期
-        #     for date_element in date_elements:
-        #         # 提取日期文本并转换为日期对象
-        #         print("date_element " ,date_element)
-        #
-        #         date_text = date_element.text.split("\n")[0].strip()  # 提取日期文本
-        #         print(f"网页上的日期文本: {date_text}")
-        #
-        #         try:
-        #             element_date = convert_to_date(date_text)
-        #         except ValueError:
-        #             # 忽略无法转换的文本（例如非日期的元素）
-        #             continue
-        #
-        #         # 检查是否是用户输入的日期
-        #         if element_date == user_input_date:
-        #             print(f"找到日期  点击该元素")
-        #             cmd = False
-        #             date_element.click()
-        #
-        #
-        #             # 如果没找到，点击下一页按钮
-        #     print(f"日期 {user_input_date} 不在当前页面，点击 '下一页'")
-        #
-        #     try:
-        #         right_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
-        #         right_button.click()
-        #         driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
-        #         # 等待页面加载完成
-        #         WebDriverWait(driver, 10).until(
-        #             EC.presence_of_element_located((By.XPATH, '//ul/li[starts-with(@id, "one")]'))
-        #         )
-        #     except Exception as e:
-        #         print(f"无法点击下一页: {e}")
-
-
-
-
-
-
-        # # 提取每个 li 元素中的日期文本
-        # for date_element in date_elements:
-        #     # 提取日期文本并转换为日期对象
-        #     date_text = date_element.text.split("\n")[0].strip()
-        #     # print(f"网页上的日期文本: {date_text}")
-        #
-        #     element_date = convert_to_date(date_text)
-        #     # print(f"转换后的日期: {element_date}")
-        #
-        #     # 检查该日期是否在当前日期的1-3天范围内
-        #     if min_date <= element_date <= max_date:
-        #         print(f"日期 {element_date} 在当前时间的1-3天范围内，不需要切换")
-        #         need_next_week = False
-        #         break
-        #     else:
-        #         print(f"日期 {element_date} 不在范围内，可能需要切换")
-        #         need_next_week = True
-        #
-        # # 如果没有日期在范围内，则点击右侧的 "next" 按钮
-        # if need_next_week:
-        #     right_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]')
-        #     right_button.click()
-        #     print("点击了 '下一周' 按钮进行切换")
-
-        # # 计算日期差距
-        # date_difference = (user_input_date - current_date).days
-        #
-        # # 输出当前日期和用户输入的日期差距
-        # print(f"当前日期: {current_date}")
-        # print(f"用户输入的日期: {user_input_date}")
-        # print(f"日期差距: {date_difference} 天")
-        #
-        # # 根据日期差距决定是否换页
-        # # 2024-10-18
-        # if date_difference < 1 or date_difference > 3:
-        #     print("日期不在当前时间的 1-3 天范围内，执行换页操作")
-        #     # 执行换页的 Selenium 操作
-        #     right_button = driver.find_element(By.XPATH, '//li[@class="right" and @onclick="nextWeek(\'next\')"]').click()
-        #
-        # else:
-        #     print("日期在当前时间的 1-3 天范围内，无需换页")
-
-
-        # 关闭浏览器
-        # driver.quit()
 
         input("Press Enter to close the browser·...")  # 按回车键后才关闭
 
