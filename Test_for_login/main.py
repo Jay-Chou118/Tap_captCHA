@@ -1,14 +1,22 @@
-import time
 import base64
 import os
-
-# import ddddocr
-
+import time
 from datetime import datetime
+from io import BytesIO
+
+from PIL import Image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+
+# 使用别人的接口
+# import  chaojiying_Python
+from chaojiying import Chaojiying_Client
+from password import FD_Account, FD_password
+
+# import pyautogui
+# import ddddocr
 
 # 获取当前系统时间
 current_time = datetime.now()
@@ -28,12 +36,11 @@ headers = {
     "Connection": "keep-alive",
 }
 
-
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
 #输入自己的账号和密码
-data = {'username': '',
-        'password': ''}
+data = {'username': '23210720160',
+        'password': 'guoBB18876322223'}
 
 # 初始化找到的标志
 found = False
@@ -46,11 +53,45 @@ week = {   '1':'one1',
            '6':'one6',
            '7':'one7'}
 
+
+# 场馆
+place =  {
+    # '江湾体育馆网球场':'8aecc6ce7176eb18017225bfcd292809',
+    # '江湾体育馆排球场': '8aecc6ce7176eb18017225c2e7d62831',
+    '张江校区网球场': '8aecc6ce8ee75f34018f047dc8ca407a',
+    '杨詠曼楼琴房': '8aecc6ce7bc2eea5017bed81312c5f49',
+    '张江校区食堂三楼羽毛球(非标)': '8aecc6ce7641d43101764ac0e3c1524d',
+    '江湾体育馆羽毛球场':'8aecc6ce749544fd01749a31a04332c2',
+    '江湾体育馆室内网球': '8aecc6ce90ae440c0191458edad81857',
+    '江湾体育馆篮球场(半场)': '8aecc6ce7176eb18017225c1505f2819',
+    '江湾体育馆排球场1号': '8aecc6ce878581d701879c7548c6737d',
+    '江湾体育馆排球场2号': '8aecc6ce7176eb18017225c2e7d62831',
+    '江湾室外网球场':'8aecc6ce780fe18301786c51f2a5627b',
+    '正大体育馆羽毛球(标场)': '2c9c486e4f821a19014f82418a900004',
+    '正大体育馆羽毛球(非标场)': '2c9c486e4f821a19014f86df4f662ba9',
+    '南区国权路网球场': '8aecc6ce7d2dffbd017de9ea4e7e4ece',
+    '南区网球场': '8aecc6ce6b6e6698016bc5dc173c11b7',
+    '邯郸路足球场': '2c9c486e4f821a19014f8266341f002f',
+    '北区体育馆羽毛球(标场)':'2c9c486e4f821a19014f826f2a4f0036',
+    '北区体育馆羽毛球(非标场)': '000000005079fc7001507a0f09a2000e',
+    '北区体育馆篮球': '2c9c486e4f821a19014f82706dfb003c',
+    '北区体育馆排球':'2c9c486e4f821a19014f827298da0047',
+    '北区体育馆舞蹈房(二楼)': '2c9c486e4f821a19014f82746a000052',
+    '北区体育馆舞蹈房(三楼)': '2c9c486e4f821a19014f82754b190058',
+    '枫林学生活动中心三楼羽毛球馆': '8aecc6ce66f1173501675d11508e75eb',
+    '枫林综合体育馆篮球(半场)': '8aecc6ce66f117350167070ac2393bca',
+    '枫林综合体育馆排球场': '8aecc6ce8672f0cd01869b1151d540f3',
+    '北区体育馆乒乓球': '8aecc6ce8d17fc0e018e50bc62d0332b',
+    '南区体育馆乒乓球': '8aecc6ce8d17fc0e018e50c24f3a3367',
+    '枫林学生活动中心乒乓球': '8aecc6ce8d17fc0e018e50cafd7b33b8',
+    '张江学生活动中心乒乓球': '8aecc6ce8d17fc0e018e50d1a00633f1',
+    '江湾体育馆乒乓球场': '8aecc6ce8ee75f34018eeef359057431',
+    }
 # 定义一个变量来记录找到的预订项
 found_reservations = []
 
 # 指定保存路径
-save_directory = os.path.join(os.path.dirname(__file__), 'captCHA_img')
+save_directory = os.path.join(os.path.dirname(__file__), 'train_img')
 
  
 # 定义函数来将网页上的日期字符串转换为 datetime 对象
@@ -108,10 +149,11 @@ def find_date_and_click(driver,user_input_date):
                 print(f"无法点击下一页: {e}")
                 break
 
+
 def save_captcha_info(driver, save_dir, start_index=1):
     """
     截取验证码图片并保存，同时获取提示的文字信息并保存。
-    
+
     参数:
     driver: WebDriver 对象
     save_dir: 图片和文本保存的文件夹路径
@@ -158,25 +200,80 @@ def save_captcha_info(driver, save_dir, start_index=1):
         print(f"获取验证码图片时发生错误: {e}")
 
     # 获取 "请依次点击：只争朝夕" 中的提示文字并保存
+    # try:
+    #     # 定位提示信息元素
+    #     tips_element = driver.find_element(By.CLASS_NAME, 'valid_tips__text')
+    #
+    #     # 获取文本内容并提取“只争朝夕”
+    #     tips_text = tips_element.text
+    #     click_sequence = tips_text.split('：')[1].strip()  # 提取冒号后面的文字
+    #
+    #     # 构造对应的文本文件名
+    #     text_filename = os.path.join(save_dir, f'{next_index:03}.txt')
+    #
+    #     # 保存提示信息
+    #     with open(text_filename, 'w', encoding='utf-8') as f:
+    #         f.write(click_sequence)
+    #
+    #     print(f"验证码提示已保存为 '{text_filename}', 提示内容: {click_sequence}")
+    #
+    # except Exception as e:
+    #     print(f"获取验证码提示时发生错误: {e}")
+
+
+def refresh_and_capture(driver, save_dir, num_captures):
+    """
+    点击刷新按钮多次，并在每次刷新后保存验证码图片和提示信息。
+
+    参数:
+    driver: WebDriver 对象
+    save_dir: 图片和文本保存的文件夹路径
+    num_captures: 总共需要截取的验证码次数
+    """
     try:
-        # 定位提示信息元素
-        tips_element = driver.find_element(By.CLASS_NAME, 'valid_tips__text')
+        for i in range(num_captures):
+            # 等待刷新按钮可点击
+            refresh_button = WebDriverWait(driver, 10).until(
+                EC.element_to_be_clickable((By.CLASS_NAME, 'valid_refresh'))
+            )
+            # 点击刷新按钮
+            refresh_button.click()
+            print(f"第 {i + 100} 次刷新按钮已点击，等待验证码刷新...")
 
-        # 获取文本内容并提取“只争朝夕”
-        tips_text = tips_element.text
-        click_sequence = tips_text.split('：')[1].strip()  # 提取冒号后面的文字
+            # 等待加载完新的验证码
+            WebDriverWait(driver, 10).until(
+                EC.presence_of_element_located((By.CLASS_NAME, 'valid_bg-img'))
+            )
+            time.sleep(1)  # 确保验证码加载完成
 
-        # 构造对应的文本文件名
-        text_filename = os.path.join(save_dir, f'{next_index:03}.txt')
-
-        # 保存提示信息
-        with open(text_filename, 'w', encoding='utf-8') as f:
-            f.write(click_sequence)
-
-        print(f"验证码提示已保存为 '{text_filename}', 提示内容: {click_sequence}")
+            # 调用保存验证码图片和文字的函数，保存当前编号的图片
+            save_captcha_info(driver, save_dir, i + 1)
 
     except Exception as e:
-        print(f"获取验证码提示时发生错误: {e}")
+        print(f"刷新或获取验证码时发生错误: {e}")
+
+
+def parse_and_click(pic_str):
+    """
+    解析汉字和坐标并执行鼠标点击操作。
+
+    参数:
+    pic_str: 以 '汉字,x,y' 格式表示汉字及其坐标的字符串
+    """
+    # 分割字符串得到各个汉字及其坐标信息
+    coordinates = pic_str.split('|')
+
+    for coord in coordinates:
+        # 将 '悬,211,69' 这样的字符串拆分为汉字和 x, y 坐标
+        char, x, y = coord.split(',')
+        x, y = int(x), int(y)
+
+        print(f"模拟点击汉字: {char} 坐标: ({x}, {y})")
+
+        # 移动到坐标 (x, y) 并点击，点击之前等待 1 秒
+        time.sleep(1)
+        pyautogui.moveTo(x, y)
+        pyautogui.click()
 
 # session = requests.session()
 # cookie_jar = session.post(url=url, data=data, headers=headers).cookies
@@ -215,8 +312,8 @@ def login():
         # cookies = driver.get_cookies()
 
         time.sleep(1)
-        driver.find_element(By.ID, 'username').send_keys(data['username'])
-        driver.find_element(By.ID, 'password').send_keys(data['password'])
+        driver.find_element(By.ID, 'username').send_keys(FD_Account)
+        driver.find_element(By.ID, 'password').send_keys(FD_password)
 
         driver.find_element(By.ID, 'idcheckloginbtn').click()
 
@@ -287,17 +384,93 @@ def login():
                         # 判断是否为可点击的预订按钮
                         if 'reserve.gif' in img_src:
                             # 执行点击操作
+                            print("执行点击操作")
                             img_element.click()
                             # 通过 XPath 定位并点击按钮
-                            driver.find_element(By.XPATH, '//input[@value="点击按钮进行验证 "]').click()
-                            
-                            time.sleep(1)
-                            save_captcha_info(driver,save_directory,1)
+                            verify_button = WebDriverWait(driver, 1).until(
+                                EC.element_to_be_clickable((By.XPATH, '//input[@value="点击按钮进行验证 "]'))
+                            )
+                            # 点击按钮
+                            verify_button.click()
 
+                            time.sleep(1)
+                            img_element = driver.find_element(By.CLASS_NAME, 'valid_bg-img')
+                            img_src = img_element.get_attribute('src')
+                            # img_element.screenshot('captcha.png')
+                            # 验证码的 src 是 base64 编码的图片
+                            if img_src.startswith('data:image'):
+                                # 去掉前缀 'data:image/jpg;base64,'
+                                img_base64 = img_src.split(',')[1]
+
+                                # 将 base64 解码并保存为图片文件
+                                img_data = base64.b64decode(img_base64)
+                                # 使用 PIL 库打开图片
+                                image = Image.open(BytesIO(img_data))
+                                image.save("captcha.jpg")
+                                print("验证码图片已保存为 captcha.jpg")
+                                tips_element = driver.find_element(By.CLASS_NAME, 'valid_tips__text')
+                                #
+                                #     # 获取文本内容并提取“只争朝夕”
+                                tips_text = tips_element.text
+                                click_sequence = tips_text.split('：')[1].strip()  # 提取冒号后面的文字
+
+                            print("aaaa" ,click_sequence)
+                            chaojiying = Chaojiying_Client('chaojiying_Account', 'chaojiying_Password', 'soft_id')
+                            print("aaaa")
+                            im = open(r'C:\Users\BME5008\Tools\Tap_CHA\Test_for_login\captcha.jpg', 'rb').read()
+                            print("aaaa")
+                            pic_str = chaojiying.PostPic(im, 9501)['pic_str']
+                            print("response")
+                            # pic_str = response['pic_str']
+                            print("开始点击")
+                            # parse_and_click(response['pic_str'])
+                            #{'err_no': 0, 'err_str': 'OK', 'pic_id': '1266509531897880004', 'pic_str': '悬,211,69|梁,251,129|刺,67,101|股,127,133', 'md5': 'c358ba3a8ca37e55c93d41da70afa2f1'}
+                            location = img_element.location
+                            size = img_element.size
+                            print(f"Image Location: {location}, Image Size: {size}")
+
+                            for index in pic_str.split('|'):
+                                _, x, y = index.split(',')
+                                x = int(x)
+                                y = int(y)
+
+                                print(f"点击坐标: x={x}, y={y}")
+                                # action = webdriver.ActionChains(driver)
+                                # # 在 img_element 的基础上进行偏移点击
+                                # action.move_to_element_with_offset(img_element, x, y).click().perform()
+
+                                # 使用 JavaScript 直接点击
+                                # JavaScript 脚本，计算并点击相对于图片的坐标位置
+                                js_script = f"""
+                                    var img = arguments[0];
+                                    var rect = img.getBoundingClientRect();
+                                    var xOffset = rect.left + window.scrollX + {x};  // 计算图片左上角的绝对X坐标
+                                    var yOffset = rect.top + window.scrollY + {y};   // 计算图片左上角的绝对Y坐标
+                                    var evt = new MouseEvent('click', {{
+                                        bubbles: true,
+                                        cancelable: true,
+                                        view: window,
+                                        clientX: xOffset,
+                                        clientY: yOffset
+                                    }});
+                                    img.dispatchEvent(evt);
+                                """
+                                driver.execute_script(js_script, img_element)
+
+                            btn_sub = WebDriverWait(driver, 2).until(
+                                EC.element_to_be_clickable((By.ID, "btn_sub"))
+                            )
+                            # 点击 "预约" 按钮
+                            btn_sub.click()
+                            print("预约按钮已点击")
+
+                            # save_captcha_info(driver,save_directory,1)
+                            # 刷新并捕获验证码
+                            # refresh_and_capture(driver, save_directory, 900)
                             # WebDriverWait(driver, 10).until(
                             #     EC.element_to_be_clickable((By.ID, "btn_sub"))
                             # ).click()
-                            print(f"已成功预订时间段: {time_slot}，服务项目: {service_item}")
+                            # print(f"已成功预订时间段: {time_slot}，服务项目: {service_item}")
                             found_reservations.append({'time': time_slot, 'service': service_item})
                             reservation_found = True
                             break
