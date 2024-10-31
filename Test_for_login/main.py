@@ -13,7 +13,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 # 使用别人的接口
 # import  chaojiying_Python
 from chaojiying import Chaojiying_Client
-from password import FD_Account, FD_password
+from password import FD_Account, FD_Password
 
 # import pyautogui
 # import ddddocr
@@ -38,16 +38,16 @@ headers = {
 
 url = 'https://ehall.fudan.edu.cn/ywtb-portal/fudan/index.html#/hall'
 
-#输入自己的账号和密码
-data = {'username': '23210720160',
-        'password': 'guoBB18876322223'}
+# #输入自己的账号和密码
+# data = {'username': '',
+#         'password': ''}
 
 # 初始化找到的标志
 found = False
 
 week = {   '1':'one1',
            '2':'one2',
-           '3':'oen3',
+           '3':'one3',
            '4':'one4',
            '5':'one5',
            '6':'one6',
