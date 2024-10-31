@@ -47,7 +47,7 @@ found = False
 
 week = {   '1':'one1',
            '2':'one2',
-           '3':'oen3',
+           '3':'one3',
            '4':'one4',
            '5':'one5',
            '6':'one6',
@@ -503,11 +503,6 @@ def login():
 #         # driver = webdriver.Edge()
 #         # driver.get(url)
 #         pass
-
-
-
-
-# driver.get("https://www.bilibili.com")
 
 
 

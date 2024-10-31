@@ -3,10 +3,10 @@ import pytesseract
 from PIL import Image
 
 print("hello?")
-image_path = r"C:\Users\BME5008\Tools\Tap_CHA\Test_for_login\train_img\002.jpg"  # 替换为图片的实际路径
+image_path = r"D:\Python_worksapce\fdu\Tap_CHA\Test_for_login\captCHA_img\001.jpg"  # 替换为图片的实际路径
 image = Image.open(image_path)
 
-gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
 # 应用二值化（可以尝试不同的二值化方法）
 _, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
